@@ -34,7 +34,7 @@ Go-to definition/declaration (CMD/CTRL + click)
 
 ## Issues
 
-If you run into any problems with the extension, have a feature request, or have any other feedback, please let us know on our [issues page](https://github.com/CalLavicka/c0-vscode-extension/issues)
+If you run into any problems with the extension, have a feature request, or have any other feedback, please let us know on our [issues page](https://github.com/cmu15122/c0-lsp-vscode/issues)
 
 ## Usage
 
@@ -69,4 +69,4 @@ The extension will look for `project.txt`/`README.txt` first in the same directo
 
 ## Contributing
 
-See [CONTRIBUTING.md](https://github.com/CalLavicka/c0-vscode-extension/blob/master/CONTRIBUTING.md) in the repository's root directory
+See [CONTRIBUTING.md](https://github.com/cmu15122/c0-lsp-vscode/blob/master/CONTRIBUTING.md) in the repository's root directory

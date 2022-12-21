@@ -3,29 +3,27 @@
 Thanks for contributing! Here are some tips on getting started with development
 
 ## General information
-* Check our [issues page](https://github.com/CalLavicka/c0-vscode-extension/issues) page, or if you want to work on something else feel free to create a new issue for it (to keep track of who is working on what) 
+
+* Check our [issues page](https://github.com/cmu15122/c0-lsp-vscode/issues) page, or if you want to work on something else feel free to create a new issue for it (to keep track of who is working on what) 
 * Please work in a new branch until your feature is ready
 
 ## Development
 
 * First, clone the repository. Make sure you have `npm` installed.
-* `npm install` on the root directory to install dependecies
+* `npm install` on the root directory to install dependencies
 * `npm run compile` to generate the parser. (You only need to re-run this if you modify the Nearley files in `server/syntax`. Changes to `.ts` files should automatically recompile)
 * `code -n .` to open it up in VSCode! (If you don't have the command on your path just open the workspace)
-* Hit `F5` to start debugging the extension in a new window. Be sure that the
-debug configuration is set to "Launch Client". After that's launched you can switch
-the debug config to "Attach to Server" and start debugging that. 
+* Hit `F5` to start debugging the extension in a new window. Be sure that the debug configuration is set to "Launch Client". After that's launched you can switch the debug config to "Attach to Server" and start debugging that. 
 
 ### Notes on parsing
+
 The parser is one of the more complex portions of this project. Here are some notes on how it works:
 
-The parsing pipeline goes line this: lex.ts produces tokens -> various \*.ne files parse them and send them to nearley-helper.ts for postprocessing, this produces the types from parse/parsedsyntax.ts.
+The parsing pipeline goes line this: lex.ts produces tokens -> various \*.ne files parse them and send them to nearley-helper.ts for post-processing, this produces the types from parse/parsedsyntax.ts.
 
-That whole thing is called by parse.ts. However we can't do it all at once - we have to stop every time we see a typedef to update the lexer with new typenames (so it can distinguish between a* b as a multiplication or a variable decl). So parse.ts splits on each semicolon.
+That whole thing is called by parse.ts. However we can't do it all at once - we have to stop every time we see a typedef to update the lexer with new type names (so it can distinguish between a* b as a multiplication or a variable decl). So parse.ts splits on each semicolon.
 
 Finally, after the parsing is done, restrictsyntax.ts converts them into ast.ts types, which essentially "cleans it up" a bit, and does a little bit of validation (e.g. \length only appears in contracts).
-
-
 
 ## Structure
 
