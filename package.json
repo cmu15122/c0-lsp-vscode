@@ -3,6 +3,7 @@
 	"displayName": "C0 VSCode Language Support",
 	"publisher": "15122staff",
 	"description": "C0 IDE features for VSCode",
+    "license": "Apache-2.0",
 	"repository": "https://github.com/CalLavicka/c0-vscode-extension",
 	"version": "2.3.1",
 	"icon": "122.png",
