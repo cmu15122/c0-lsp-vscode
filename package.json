@@ -77,7 +77,22 @@
 				"scopeName": "source.bc0",
 				"path": "./syntaxes/BC0.tmLanguage.json"
 			}
-		]
+		],
+        "customEditors": [
+            {
+                "viewType": "c0.objectFile",
+                "displayName": "C0 Object File",
+                "selector": [
+                    {
+                        "filenamePattern": "*.o0"
+                    },
+                    {
+                        "filenamePattern": "*.o1"
+                    }
+                ],
+                "priority": "default"
+            }
+        ]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

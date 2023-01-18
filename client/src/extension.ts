@@ -7,10 +7,16 @@ import {
     ServerOptions,
     TransportKind
 } from 'vscode-languageclient/node';
+import { ObjectFileEditorProvider } from './objectFileEditor';
 
 let client: LanguageClient;
 
 export function activate(context: ExtensionContext) {
+    // Register custom "editor" for object files. This is really a read-only
+    // view into the file, where we can display arbitrary content, but the
+    // VSCode API formulates this as an editor.
+    context.subscriptions.push(ObjectFileEditorProvider.register(context));
+
     // The server is implemented in node
     const serverModule = context.asAbsolutePath(
         path.join('server', 'out', 'server.js')
@@ -37,8 +43,8 @@ export function activate(context: ExtensionContext) {
         synchronize: {
             // Notify the server about file changes to .c0 or .c1 files, for dependencies
             fileEvents: [workspace.createFileSystemWatcher('**/*.c0'),
-                         workspace.createFileSystemWatcher('**/*.c1'),
-                         workspace.createFileSystemWatcher('**/project.txt')]
+            workspace.createFileSystemWatcher('**/*.c1'),
+            workspace.createFileSystemWatcher('**/project.txt')]
         }
     };
 
