@@ -3,9 +3,9 @@
 	"displayName": "C0 VSCode Language Support",
 	"publisher": "15122staff",
 	"description": "C0 IDE features for VSCode",
-    "license": "Apache-2.0",
+	"license": "Apache-2.0",
 	"repository": "https://github.com/cmu15122/c0-lsp-vscode",
-	"version": "2.3.1",
+	"version": "2.4.0",
 	"icon": "122.png",
 	"engines": {
 		"vscode": "^1.39.0"
@@ -78,21 +78,21 @@
 				"path": "./syntaxes/BC0.tmLanguage.json"
 			}
 		],
-        "customEditors": [
-            {
-                "viewType": "c0.objectFile",
-                "displayName": "C0 Object File",
-                "selector": [
-                    {
-                        "filenamePattern": "*.o0"
-                    },
-                    {
-                        "filenamePattern": "*.o1"
-                    }
-                ],
-                "priority": "default"
-            }
-        ]
+		"customEditors": [
+			{
+				"viewType": "c0.objectFile",
+				"displayName": "C0 Object File",
+				"selector": [
+					{
+						"filenamePattern": "*.o0"
+					},
+					{
+						"filenamePattern": "*.o1"
+					}
+				],
+				"priority": "default"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

@@ -5,6 +5,11 @@
 *New major feature*: Indentor. "Format document" will now properly indent the document 
 -->
 
+## [2.4.0] - January 26, 2023
+- Attempting to open an `.o0` or `.o1` file will now display a message
+  redirecting the user to use `cc0 -i` in the terminal to view the
+  interface.
+
 ## [2.3.2] - June 15, 2022
 - Fixed the "No README.md" warning being shown at every keystroke for files with no dependencies
 - Fixed the server crashing when typing in //@
