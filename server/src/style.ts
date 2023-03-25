@@ -65,6 +65,73 @@ class FindBoolCompares extends ast.Visitor<Set<StyleError>> {
     }
 }
 
+class FindIntBoundsChecks extends ast.Visitor<Set<StyleError>> {
+    protected visitBinaryExpression(binaryExpression: ast.BinaryExpression, state: Set<StyleError>): void {
+        const error = this.checkBinExpr(binaryExpression);
+        if (error !== null) {
+            state.add(error);
+        }
+
+        this.visit(binaryExpression.left, state);
+        this.visit(binaryExpression.right, state);
+    }
+
+    private checkBinExpr(binaryExpression: ast.BinaryExpression): StyleError | null {
+        const alwaysTrue: [
+            (e: ast.Expression) => boolean,
+            (op: ast.BinaryOperator) => boolean,
+            (e: ast.Expression) => boolean,
+        ][] = [
+                [_ => true, x => x === "<=", e => this.isFunctionCall(e, "int_max")],
+                [e => this.isFunctionCall(e, "int_max"), x => x === ">=", _ => true],
+                [_ => true, x => x === ">=", e => this.isFunctionCall(e, "int_min")],
+                [e => this.isFunctionCall(e, "int_min"), x => x === "<=", _ => true],
+            ];
+
+        for (const [l, op, r] of alwaysTrue) {
+            if (l(binaryExpression.left)
+                && op(binaryExpression.operator)
+                && r(binaryExpression.right)) {
+                return new StyleError(
+                    DiagnosticSeverity.Warning,
+                    binaryExpression,
+                    "This comparison is always true"
+                );
+            }
+        }
+
+        const alwaysFalse: [
+            (e: ast.Expression) => boolean,
+            (op: ast.BinaryOperator) => boolean,
+            (e: ast.Expression) => boolean,
+        ][] = [
+                [_ => true, x => x === ">", e => this.isFunctionCall(e, "int_max")],
+                [e => this.isFunctionCall(e, "int_max"), x => x === "<", _ => true],
+
+                [_ => true, x => x === "<", e => this.isFunctionCall(e, "int_min")],
+                [e => this.isFunctionCall(e, "int_min"), x => x === ">", _ => true],
+            ];
+
+        for (const [l, op, r] of alwaysFalse) {
+            if (l(binaryExpression.left)
+                && op(binaryExpression.operator)
+                && r(binaryExpression.right)) {
+                return new StyleError(
+                    DiagnosticSeverity.Warning,
+                    binaryExpression,
+                    "This comparison is always false"
+                );
+            }
+        }
+
+        return null;
+    }
+
+    private isFunctionCall(expr: ast.Expression, functionName: string): boolean {
+        return expr.tag === "CallExpression" && expr.callee.name === functionName;
+    }
+}
+
 
 export function checkProgram(genv: GlobalEnv, decls: ast.Declaration[]): Set<StyleError> {
     const issues = new Set<StyleError>();
@@ -72,6 +139,7 @@ export function checkProgram(genv: GlobalEnv, decls: ast.Declaration[]): Set<Sty
     for (const decl of decls) {
         (new FindBadReturns()).visit(decl, issues);
         (new FindBoolCompares()).visit(decl, issues);
+        (new FindIntBoundsChecks()).visit(decl, issues);
     }
 
     return issues;
