@@ -5,7 +5,7 @@ import { GlobalEnv } from "./typecheck/globalenv";
 
 // TODO:
 // - [~]      if (c) { return true; } else { return false; }
-// - [ ]      c == true
+// - [~]      c == true
 // - [ ]      write without a read
 // - [ ]      unused vars?
 // - [ ]      // @assert [we don't have comments in the AST!]
@@ -45,11 +45,33 @@ class FindBadReturns extends ast.Visitor<Set<StyleError>> {
 }
 
 
+class FindBoolCompares extends ast.Visitor<Set<StyleError>> {
+    protected visitBinaryExpression(binaryExpression: ast.BinaryExpression, state: Set<StyleError>): void {
+        if ((binaryExpression.left.tag === "BoolLiteral"
+            || binaryExpression.right.tag === "BoolLiteral")
+            && (binaryExpression.operator === "==" ||
+                binaryExpression.operator === "!=")
+        ) {
+            state.add(new StyleError(
+                DiagnosticSeverity.Warning,
+                binaryExpression, `Unneeded ${binaryExpression.operator === "!=" ? "in" : ""}equality comparison with bool literal`,
+                // TODO: use the actual other operand
+                "consider rewriting this to just 'x/!x'"
+            ));
+        }
+
+        this.visit(binaryExpression.left, state);
+        this.visit(binaryExpression.right, state);
+    }
+}
+
+
 export function checkProgram(genv: GlobalEnv, decls: ast.Declaration[]): Set<StyleError> {
     const issues = new Set<StyleError>();
 
     for (const decl of decls) {
         (new FindBadReturns()).visit(decl, issues);
+        (new FindBoolCompares()).visit(decl, issues);
     }
 
     return issues;
