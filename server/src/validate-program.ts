@@ -12,9 +12,10 @@ import {
 
 import { checkProgram } from "./typecheck/programs";
 import * as ast from "./ast";
+import * as style from "./style";
 import { GlobalEnv, initEmpty, cloneGenv } from "./typecheck/globalenv";
 import * as path from "path";
-import { mkParser, parseDocument, typingErrorsToDiagnostics, ParseResult } from "./parse";
+import { mkParser, parseDocument, errorsToDiagnostics, ParseResult } from "./parse";
 import { FileSet } from "./util";
 import { C0ObjectSourceFile, C0SourceFile, C0TextDocumentFile } from "./c0file";
 import { uriToWorkspace } from "./server";
@@ -226,6 +227,8 @@ export async function parseTextDocument(dependencies: C0SourceFile[], textDocume
     }
   }
 
+  const styleResult = style.checkProgram(genv, decls);
+
   // At this point we have parsed all the declarations, 
   // as well as loaded all libraries, so we
   // can run the typechecker
@@ -254,7 +257,7 @@ export async function parseTextDocument(dependencies: C0SourceFile[], textDocume
   openFiles.set(textDocument.uri, typecheckResult.genv);
 
   // Return any errors we encountered
-  return typingErrorsToDiagnostics(typecheckResult.errors);
+  return errorsToDiagnostics(new Set([...typecheckResult.errors, ...styleResult]));
 }
 
 /**
