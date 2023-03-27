@@ -1,4 +1,4 @@
-import { ParsingError, TypingError } from "./error";
+import { ParsingError, StyleError, TypingError } from "./error";
 import { Diagnostic, DiagnosticSeverity, Position, TextDocument } from "vscode-languageserver";
 import { Either, Right, Left } from "./util";
 import { TypeLexer } from "./lex";
@@ -140,10 +140,10 @@ export interface C0Parser extends nearley.Parser {
 }
 
 /** 
- * Converts typing errors to a list of VSCode diagnostics,
+ * Converts errors to a list of VSCode diagnostics,
  * keeping source information
  */
-export function typingErrorsToDiagnostics(errors: Iterable<TypingError>): Diagnostic[] {
+export function errorsToDiagnostics(errors: Iterable<TypingError | StyleError>): Diagnostic[] {
   const diagnostics = [];
 
   for (const error of errors) {
@@ -538,7 +538,7 @@ export function parseDocument(text: C0SourceFile, oldParser: C0Parser, genv: Glo
     }
 
     // Show all of the errors gathered 
-    diagnostics.push(...typingErrorsToDiagnostics(errors));
+    diagnostics.push(...errorsToDiagnostics(errors));
   }
 
   return Left(diagnostics);

@@ -34,6 +34,23 @@ export class TypingError extends Error {
     }
 }
 
+export class StyleError extends Error {
+    public readonly name: "StyleError";
+
+    public severity: DiagnosticSeverity;
+    public loc: null | SourceLocation;
+
+    constructor(severity: DiagnosticSeverity, syn: { loc?: SourceLocation }, msg: string, ...hints: string[]) {
+        const loc = syn.loc || null;
+        const hintstr = hints.length === 0 ? "" : "\n\nHint: " + hints.join("\n      ");
+        super(`${msg}${hintstr}`);
+
+        this.name = "StyleError";
+        this.loc = loc;
+        this.severity = severity;
+    }
+}
+
 export class ImpossibleError extends Error {
     public readonly name: "ImpossibleError" = "ImpossibleError";
     constructor(msg: string) {
