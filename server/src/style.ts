@@ -19,7 +19,7 @@ class FindBadReturns extends ast.Visitor<Set<StyleError>> {
             state.add(new StyleError(
                 DiagnosticSeverity.Warning,
                 // TODO: use the actual condition
-                ifStatement, "Unnecessary if statement", "consider replacing this if statement with 'return condition;'"
+                ifStatement, "unnecessary if statement", "consider replacing this if statement with 'return <loop guard>;'"
             ));
         } else if (ifStatement.alternate
             && this.isOnlyReturnBool(ifStatement.consequent, false)
@@ -28,7 +28,7 @@ class FindBadReturns extends ast.Visitor<Set<StyleError>> {
             state.add(new StyleError(
                 DiagnosticSeverity.Warning,
                 // TODO: use the actual condition
-                ifStatement, "Unnecessary if statement", "consider replacing this if statement with 'return !condition;'"
+                ifStatement, "unnecessary if statement", "consider replacing this if statement with 'return !<loop guard>;'"
             ));
         }
 
@@ -54,9 +54,9 @@ class FindBoolCompares extends ast.Visitor<Set<StyleError>> {
         ) {
             state.add(new StyleError(
                 DiagnosticSeverity.Warning,
-                binaryExpression, `Unneeded ${binaryExpression.operator === "!=" ? "in" : ""}equality comparison with bool literal`,
+                binaryExpression, `unneeded ${binaryExpression.operator === "!=" ? "in" : ""}equality comparison with bool literal`,
                 // TODO: use the actual other operand
-                "consider rewriting this to just 'x/!x'"
+                "consider rewriting this to just use the non-literal operand, and perhaps negation"
             ));
         }
 
@@ -95,7 +95,7 @@ class FindIntBoundsChecks extends ast.Visitor<Set<StyleError>> {
                 return new StyleError(
                     DiagnosticSeverity.Warning,
                     binaryExpression,
-                    "This comparison is always true"
+                    "this comparison is always true"
                 );
             }
         }
@@ -119,7 +119,7 @@ class FindIntBoundsChecks extends ast.Visitor<Set<StyleError>> {
                 return new StyleError(
                     DiagnosticSeverity.Warning,
                     binaryExpression,
-                    "This comparison is always false"
+                    "this comparison is always false"
                 );
             }
         }
