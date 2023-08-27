@@ -5,6 +5,10 @@
 *New major feature*: Indentor. "Format document" will now properly indent the document 
 -->
 
+## [2.5.0] - August 27, 2023
+- Added several style checks for bad code patterns (e.g., `== true`).
+- Added ability to confirm other installed extensions are permitted.
+
 ## [2.4.0] - January 26, 2023
 - Attempting to open an `.o0` or `.o1` file will now display a message
   redirecting the user to use `cc0 -i` in the terminal to view the
