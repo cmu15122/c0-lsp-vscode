@@ -91,6 +91,19 @@
 					}
 				],
 				"priority": "default"
+			},
+			{
+				"viewType": "c0.sourceFile",
+				"displayName": "C0 Source File",
+				"selector": [
+					{
+						"filenamePattern": "*.c0"
+					},
+					{
+						"filenamePattern": "*.c1"
+					}
+				],
+				"priority": "default"
 			}
 		]
 	},

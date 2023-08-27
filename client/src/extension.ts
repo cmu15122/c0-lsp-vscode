@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { workspace, ExtensionContext } from 'vscode';
+import { workspace, ExtensionContext, extensions } from 'vscode';
 
 import {
     LanguageClient,
@@ -8,6 +8,7 @@ import {
     TransportKind
 } from 'vscode-languageclient/node';
 import { ObjectFileEditorProvider } from './objectFileEditor';
+import { SourceFileBlocker, SourceFileAllower } from './sourceFileEditors';
 
 let client: LanguageClient;
 
@@ -16,6 +17,14 @@ export function activate(context: ExtensionContext) {
     // view into the file, where we can display arbitrary content, but the
     // VSCode API formulates this as an editor.
     context.subscriptions.push(ObjectFileEditorProvider.register(context));
+
+    if (hasBlacklistedExtension()) {
+        // Register custom "editor" for source files. This just wraps the check for
+        // copilot et al. so we can disable editing features if those are installed.
+        context.subscriptions.push(SourceFileBlocker.register(context));
+    } else {
+        context.subscriptions.push(SourceFileAllower.register(context));
+    }
 
     // The server is implemented in node
     const serverModule = context.asAbsolutePath(
@@ -65,4 +74,19 @@ export function deactivate(): Thenable<void> | undefined {
         return undefined;
     }
     return client.stop();
+}
+
+// List of extension IDs for disabled extensions. 
+const extensionBlacklist = [
+    "github.copilot"
+];
+
+function hasBlacklistedExtension(): boolean {
+    for (const id of extensionBlacklist) {
+        if (extensions.getExtension(id) !== undefined) {
+            return true;
+        }
+    }
+
+    return false;
 }
