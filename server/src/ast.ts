@@ -566,6 +566,13 @@ export type ConcreteType =
     | { tag: "PointerType" }
     | { tag: "TaggedPointerType" };
 
+export type AstNode =
+    | AnyType
+    | Expression
+    | Statement
+    | Declaration
+    | VariableDeclarationOnly;
+
 /**
  * Converts a 0-indexed position to a 1-indexed position
  * @param pos 
@@ -586,4 +593,273 @@ export function toVscodePosition(pos: Position): vscode.Position {
         character: pos.column - 1,
         line: pos.line - 1
     };
+}
+
+export abstract class Visitor<T> {
+    public visit(it: AstNode | null | undefined, state: T): void {
+        switch (it?.tag) {
+            case "Identifier": this.visitIdentifier(it, state); break;
+            case "AmbiguousNullPointer": this.visitAmbiguousNullPointer(it, state); break;
+            case "NamedFunctionType": this.visitNamedFunctionType(it, state); break;
+            case "AnonymousFunctionTypePointer": this.visitAnonymousFunctionTypePointer(it, state); break;
+            case "FunctionType": this.visitFunctionType(it, state); break;
+            case "IntType": this.visitIntType(it, state); break;
+            case "BoolType": this.visitBoolType(it, state); break;
+            case "StringType": this.visitStringType(it, state); break;
+            case "CharType": this.visitCharType(it, state); break;
+            case "VoidType": this.visitVoidType(it, state); break;
+            case "PointerType": this.visitPointerType(it, state); break;
+            case "ArrayType": this.visitArrayType(it, state); break;
+            case "StructType": this.visitStructType(it, state); break;
+            case "IntLiteral": this.visitIntLiteral(it, state); break;
+            case "StringLiteral": this.visitStringLiteral(it, state); break;
+            case "CharLiteral": this.visitCharLiteral(it, state); break;
+            case "BoolLiteral": this.visitBoolLiteral(it, state); break;
+            case "NullLiteral": this.visitNullLiteral(it, state); break;
+            case "ArrayMemberExpression": this.visitArrayMemberExpression(it, state); break;
+            case "StructMemberExpression": this.visitStructMemberExpression(it, state); break;
+            case "CallExpression": this.visitCallExpression(it, state); break;
+            case "IndirectCallExpression": this.visitIndirectCallExpression(it, state); break;
+            case "CastExpression": this.visitCastExpression(it, state); break;
+            case "UnaryExpression": this.visitUnaryExpression(it, state); break;
+            case "BinaryExpression": this.visitBinaryExpression(it, state); break;
+            case "LogicalExpression": this.visitLogicalExpression(it, state); break;
+            case "ConditionalExpression": this.visitConditionalExpression(it, state); break;
+            case "AllocExpression": this.visitAllocExpression(it, state); break;
+            case "AllocArrayExpression": this.visitAllocArrayExpression(it, state); break;
+            case "ResultExpression": this.visitResultExpression(it, state); break;
+            case "LengthExpression": this.visitLengthExpression(it, state); break;
+            case "HasTagExpression": this.visitHasTagExpression(it, state); break;
+            case "AssignmentStatement": this.visitAssignmentStatement(it, state); break;
+            case "UpdateStatement": this.visitUpdateStatement(it, state); break;
+            case "ExpressionStatement": this.visitExpressionStatement(it, state); break;
+            case "VariableDeclaration": this.visitVariableDeclaration(it, state); break;
+            case "IfStatement": this.visitIfStatement(it, state); break;
+            case "WhileStatement": this.visitWhileStatement(it, state); break;
+            case "ForStatement": this.visitForStatement(it, state); break;
+            case "ReturnStatement": this.visitReturnStatement(it, state); break;
+            case "BlockStatement": this.visitBlockStatement(it, state); break;
+            case "AssertStatement": this.visitAssertStatement(it, state); break;
+            case "ErrorStatement": this.visitErrorStatement(it, state); break;
+            case "BreakStatement": this.visitBreakStatement(it, state); break;
+            case "ContinueStatement": this.visitContinueStatement(it, state); break;
+            case "StructDeclaration": this.visitStructDeclaration(it, state); break;
+            case "FunctionDeclaration": this.visitFunctionDeclaration(it, state); break;
+            case "TypeDefinition": this.visitTypeDefinition(it, state); break;
+            case "FunctionTypeDefinition": this.visitFunctionTypeDefinition(it, state); break;
+            case "PragmaUseLib": this.visitPragmaUseLib(it, state); break;
+            case "PragmaUseFile": this.visitPragmaUseFile(it, state); break;
+            case "ArrayType": this.visitArrayType(it, state); break;
+        }
+    }
+
+    protected visitIdentifier(_: Identifier, state: T): void { return; }
+
+    protected visitAmbiguousNullPointer(_: { tag: "AmbiguousNullPointer" }, state: T): void { return; }
+
+    protected visitNamedFunctionType(namedFunctionType: {
+        tag: "NamedFunctionType", definition: FunctionDeclaration
+    }, state: T): void {
+        this.visit(namedFunctionType.definition, state);
+    }
+
+    protected visitAnonymousFunctionTypePointer(anonymousFunctionTypePointer: {
+        tag: "AnonymousFunctionTypePointer", definition: FunctionDeclaration
+    }, state: T): void {
+        this.visit(anonymousFunctionTypePointer.definition, state);
+    }
+
+    protected visitFunctionType(functionType: {
+        tag: "FunctionType", definition: FunctionDeclaration
+    }, state: T): void {
+        this.visit(functionType.definition, state);
+    }
+
+    protected visitIntType(_: IntType, state: T): void { return; }
+
+    protected visitBoolType(_: BoolType, state: T): void { return; }
+
+    protected visitStringType(_: StringType, state: T): void { return; }
+
+    protected visitCharType(_: CharType, state: T): void { return; }
+
+    protected visitVoidType(_: VoidType, state: T): void { return; }
+
+    protected visitPointerType(p: PointerType, state: T): void {
+        this.visit(p.argument, state);
+    }
+
+    protected visitArrayType(arr: ArrayType, state: T): void {
+        this.visit(arr.argument, state);
+    }
+
+    protected visitStructType(struct: StructType, state: T): void {
+        this.visit(struct.id, state);
+    }
+
+    protected visitIntLiteral(_: IntLiteral, state: T): void { return; }
+
+    protected visitStringLiteral(_: StringLiteral, state: T): void { return; }
+
+    protected visitCharLiteral(_: CharLiteral, state: T): void { return; }
+
+    protected visitBoolLiteral(_: BoolLiteral, state: T): void { return; }
+
+    protected visitNullLiteral(_: NullLiteral, state: T): void { return; }
+
+    protected visitArrayMemberExpression(arrayMemberExpression: ArrayMemberExpression, state: T): void {
+        this.visit(arrayMemberExpression.object, state);
+        this.visit(arrayMemberExpression.index, state);
+    }
+
+    protected visitStructMemberExpression(structMemberExpression: StructMemberExpression, state: T): void {
+        this.visit(structMemberExpression.object, state);
+        this.visit(structMemberExpression.field, state);
+    }
+
+    protected visitCallExpression(callExpression: CallExpression, state: T): void {
+        this.visit(callExpression.callee, state);
+        callExpression.arguments.forEach(x => this.visit(x, state));
+    }
+
+    protected visitIndirectCallExpression(indirectCallExpression: IndirectCallExpression, state: T): void {
+        this.visit(indirectCallExpression.callee, state);
+        indirectCallExpression.arguments.forEach(x => this.visit(x, state));
+    }
+
+    protected visitCastExpression(castExpression: CastExpression, state: T): void {
+        this.visit(castExpression.kind, state);
+        this.visit(castExpression.argument, state);
+    }
+
+    protected visitUnaryExpression(unaryExpression: UnaryExpression, state: T): void {
+        this.visit(unaryExpression.argument, state);
+    }
+
+    protected visitBinaryExpression(binaryExpression: BinaryExpression, state: T): void {
+        this.visit(binaryExpression.left, state);
+        this.visit(binaryExpression.right, state);
+    }
+
+    protected visitLogicalExpression(logicalExpression: LogicalExpression, state: T): void {
+        this.visit(logicalExpression.left, state);
+        this.visit(logicalExpression.right, state);
+    }
+
+    protected visitConditionalExpression(conditionalExpression: ConditionalExpression, state: T): void {
+        this.visit(conditionalExpression.test, state);
+        this.visit(conditionalExpression.consequent, state);
+        this.visit(conditionalExpression.alternate, state);
+    }
+
+    protected visitAllocExpression(allocExpression: AllocExpression, state: T): void {
+        this.visit(allocExpression.kind, state);
+    }
+
+    protected visitAllocArrayExpression(allocArrayExpression: AllocArrayExpression, state: T): void {
+        this.visit(allocArrayExpression.kind, state);
+        this.visit(allocArrayExpression.argument, state);
+    }
+
+    protected visitResultExpression(_: ResultExpression, state: T): void { return; }
+
+    protected visitLengthExpression(lengthExpression: LengthExpression, state: T): void {
+        this.visit(lengthExpression.argument, state);
+    }
+
+    protected visitHasTagExpression(hasTagExpression: HasTagExpression, state: T): void {
+        this.visit(hasTagExpression.kind, state);
+        this.visit(hasTagExpression.argument, state);
+    }
+
+    protected visitAssignmentStatement(assignmentStatement: AssignmentStatement, state: T): void {
+        this.visit(assignmentStatement.left, state);
+        this.visit(assignmentStatement.right, state);
+    }
+
+    protected visitUpdateStatement(updateStatement: UpdateStatement, state: T): void {
+        this.visit(updateStatement.argument, state);
+    }
+
+    protected visitExpressionStatement(expressionStatement: ExpressionStatement, state: T): void {
+        this.visit(expressionStatement.expression, state);
+    }
+
+    // Partial to allow for VariableDeclarationOnly
+    protected visitVariableDeclaration(variableDeclaration: Partial<VariableDeclaration>, state: T): void {
+        this.visit(variableDeclaration.kind, state);
+        this.visit(variableDeclaration.id, state);
+        this.visit(variableDeclaration.init, state);
+    }
+
+    protected visitIfStatement(ifStatement: IfStatement, state: T): void {
+        this.visit(ifStatement.test, state);
+        this.visit(ifStatement.consequent, state);
+        this.visit(ifStatement.alternate, state);
+    }
+
+    protected visitWhileStatement(whileStatement: WhileStatement, state: T): void {
+        whileStatement.invariants.forEach(x => this.visit(x, state));
+        this.visit(whileStatement.test, state);
+        this.visit(whileStatement.body, state);
+    }
+
+    protected visitForStatement(forStatement: ForStatement, state: T): void {
+        forStatement.invariants.forEach(x => this.visit(x, state));
+        this.visit(forStatement.init, state);
+        this.visit(forStatement.test, state);
+        this.visit(forStatement.update, state);
+        this.visit(forStatement.body, state);
+    }
+
+    protected visitReturnStatement(returnStatement: ReturnStatement, state: T): void {
+        this.visit(returnStatement.argument, state);
+    }
+
+    protected visitBlockStatement(blockStatement: BlockStatement, state: T): void {
+        blockStatement.body.forEach(x => this.visit(x, state));
+    }
+
+    protected visitAssertStatement(assertStatement: AssertStatement, state: T): void {
+        this.visit(assertStatement.test, state);
+    }
+
+    protected visitErrorStatement(errorStatement: ErrorStatement, state: T): void {
+        this.visit(errorStatement.argument, state);
+    }
+
+    protected visitBreakStatement(_: BreakStatement, state: T): void { return; }
+
+    protected visitContinueStatement(_: ContinueStatement, state: T): void { return; }
+
+    protected visitStructDeclaration(structDeclaration: StructDeclaration, state: T): void {
+        this.visit(structDeclaration.id, state);
+        structDeclaration.definitions?.forEach(x => this.visit(x, state));
+    }
+
+    protected visitVariableDeclarationOnly(variableDeclarationOnly: VariableDeclarationOnly, state: T): void {
+        this.visit(variableDeclarationOnly.kind, state);
+        this.visit(variableDeclarationOnly.id, state);
+    }
+
+    protected visitFunctionDeclaration(functionDeclaration: FunctionDeclaration, state: T): void {
+        this.visit(functionDeclaration.returns, state);
+        this.visit(functionDeclaration.id, state);
+        functionDeclaration.params.forEach(x => this.visit(x, state));
+        functionDeclaration.preconditions.forEach(x => this.visit(x, state));
+        functionDeclaration.postconditions.forEach(x => this.visit(x, state));
+        this.visit(functionDeclaration.body, state);
+    }
+
+    protected visitTypeDefinition(typeDefinition: TypeDefinition, state: T): void {
+        this.visit(typeDefinition.definition, state);
+    }
+
+    protected visitFunctionTypeDefinition(functionTypeDefinition: FunctionTypeDefinition, state: T): void {
+        this.visit(functionTypeDefinition.definition, state);
+    }
+
+    protected visitPragmaUseLib(_: PragmaUseLib, state: T): void { return; }
+
+    protected visitPragmaUseFile(_: PragmaUseFile, state: T): void { return; }
 }
