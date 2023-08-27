@@ -18,11 +18,14 @@ export function activate(context: ExtensionContext) {
     // VSCode API formulates this as an editor.
     context.subscriptions.push(ObjectFileEditorProvider.register(context));
 
+    // Register a custom editor for source files depending on if we deny the
+    // use of a certain extension (controlled by extension ID blacklist).
     if (hasBlacklistedExtension()) {
-        // Register custom "editor" for source files. This just wraps the check for
-        // copilot et al. so we can disable editing features if those are installed.
         context.subscriptions.push(SourceFileBlocker.register(context));
     } else {
+        // Note: we still have to register _something_ for this, otherwise
+        // opening files just hangs. This version just causes the normal editor
+        // to be opened.
         context.subscriptions.push(SourceFileAllower.register(context));
     }
 
