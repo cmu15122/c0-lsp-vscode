@@ -5,6 +5,10 @@
 *New major feature*: Indentor. "Format document" will now properly indent the document 
 -->
 
+## [2.5.1] - August 30, 2023
+- Reverted a change in 2.5.0 regarding custom editors due to regressions
+  on MacOS.
+
 ## [2.5.0] - August 27, 2023
 - Added several style checks for bad code patterns (e.g., `== true`).
 - Added ability to confirm other installed extensions are permitted.
