@@ -8,7 +8,6 @@ import {
     TransportKind
 } from 'vscode-languageclient/node';
 import { ObjectFileEditorProvider } from './objectFileEditor';
-import { SourceFileBlocker, SourceFileAllower } from './sourceFileEditors';
 
 let client: LanguageClient;
 
@@ -17,17 +16,6 @@ export function activate(context: ExtensionContext) {
     // view into the file, where we can display arbitrary content, but the
     // VSCode API formulates this as an editor.
     context.subscriptions.push(ObjectFileEditorProvider.register(context));
-
-    // Register a custom editor for source files depending on if we deny the
-    // use of a certain extension (controlled by extension ID blacklist).
-    if (hasBlacklistedExtension()) {
-        context.subscriptions.push(SourceFileBlocker.register(context));
-    } else {
-        // Note: we still have to register _something_ for this, otherwise
-        // opening files just hangs. This version just causes the normal editor
-        // to be opened.
-        context.subscriptions.push(SourceFileAllower.register(context));
-    }
 
     // The server is implemented in node
     const serverModule = context.asAbsolutePath(
